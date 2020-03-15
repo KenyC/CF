@@ -1,0 +1,232 @@
+%&cf
+% %PRECOMPILE COMMAND pdftex -ini -jobname="plurals_event_chap_34" "&pdflatex" mylatexformat.ltx plurals_event_chap_34.tex
+% \documentclass[english]{article}
+% \usepackage[T1]{fontenc}
+% \usepackage[latin1]{inputenc}
+% \usepackage[sort]{natbib}
+% \usepackage{stdprmbl}
+
+% \usepackage{parskip}
+
+% \lingset{interpartskip = -5pt}
+% \lingset{aboveexskip = 3pt,belowexskip = 3pt}
+
+
+% \usepackage{listings}
+
+% \definecolor{gray_ulisses}{gray}{0.55}
+% \definecolor{castanho_ulisses}{rgb}{0.71,0.33,0.14}
+% \definecolor{preto_ulisses}{rgb}{0.41,0.20,0.04}
+% \definecolor{green_ulises}{rgb}{0.2,0.75,0}
+
+% \lstdefinelanguage{HaskellUlisses} {
+% 	basicstyle=\footnotesize,
+% 	sensitive=true,
+% 	morecomment=[l][\color{gray_ulisses}\ttfamily\tiny]{--},
+% 	morecomment=[s][\color{gray_ulisses}\ttfamily\tiny]{\{-}{-\}},
+% 	morestring=[b]",
+% 	stringstyle=\color{red},
+% 	showstringspaces=false,
+% 	numberstyle=\tiny,
+% 	numberblanklines=true,
+% 	showspaces=false,
+% 	breaklines=true,
+% 	showtabs=false,
+% 	emph=
+% 	{[1]
+% 		FilePath,IOError,abs,acos,acosh,all,and,any,appendFile,approxRational,asTypeOf,asin,
+% 		asinh,atan,atan2,atanh,basicIORun,break,catch,ceiling,chr,compare,concat,concatMap,
+% 		const,cos,cosh,curry,cycle,decodeFloat,denominator,digitToInt,div,divMod,drop,
+% 		dropWhile,either,elem,encodeFloat,enumFrom,enumFromThen,enumFromThenTo,enumFromTo,
+% 		error,even,exp,exponent,fail,filter,flip,floatDigits,floatRadix,floatRange,floor,
+% 		fmap,foldl,foldl1,foldr,foldr1,fromDouble,fromEnum,fromInt,fromInteger,fromIntegral,
+% 		fromRational,fst,gcd,getChar,getContents,getLine,head,id,inRange,index,init,intToDigit,
+% 		interact,ioError,isAlpha,isAlphaNum,isAscii,isControl,isDenormalized,isDigit,isHexDigit,
+% 		isIEEE,isInfinite,isLower,isNaN,isNegativeZero,isOctDigit,isPrint,isSpace,isUpper,iterate,
+% 		last,lcm,length,lex,lexDigits,lexLitChar,lines,log,logBase,lookup,map,mapM,mapM_,max,
+% 		maxBound,maximum,maybe,min,minBound,minimum,mod,negate,not,notElem,null,numerator,odd,
+% 		or,ord,otherwise,pi,pred,primExitWith,print,product,properFraction,putChar,putStr,putStrLn,quot,
+% 		quotRem,range,rangeSize,read,readDec,readFile,readFloat,readHex,readIO,readInt,readList,readLitChar,
+% 		readLn,readOct,readParen,readSigned,reads,readsPrec,realToFrac,recip,rem,repeat,replicate,return,
+% 		reverse,round,scaleFloat,scanl,scanl1,scanr,scanr1,seq,sequence,sequence_,show,showChar,showInt,
+% 		showList,showLitChar,showParen,showSigned,showString,shows,showsPrec,significand,signum,sin,
+% 		sinh,snd,span,splitAt,sqrt,subtract,succ,sum,tail,take,takeWhile,tan,tanh,threadToIOResult,toEnum,
+% 		toInt,toInteger,toLower,toRational,toUpper,truncate,uncurry,undefined,unlines,until,unwords,unzip,
+% 		unzip3,userError,words,writeFile,zip,zip3,zipWith,zipWith3,listArray,doParse
+% 	},
+% 	emphstyle={[1]\color{blue}},
+% 	emph=
+% 	{[2]
+% 		Bool,Char,Double,Either,Float,IO,Integer,Int,Maybe,Ordering,Rational,Ratio,ReadS,ShowS,String,
+% 		Word8,InPacket, ContextFree
+% 	},
+% 	emphstyle={[2]\color{green!40!black}},
+% 	emph=
+% 	{[3]
+% 		case,class,data,deriving,do,else,if,import,in,infixl,infixr,instance,let,
+% 		module,of,primitive,then,type,where
+% 	},
+% 	emphstyle={[3]\color{blue}\textbf},
+% 	emph=
+% 	{[4]
+% 		quot,rem,div,mod,elem,notElem,seq, pure, mappend, mempty
+% 	},
+% 	emphstyle={[4]\color{purple!40!black}\textbf},
+% 	emph=
+% 	{[5]
+% 		EQ,False,GT,Just,LT,Left,Nothing,Right,True,Show,Eq,Ord,Num, Monoid, Collection, Applicative
+% 	},
+% 	emphstyle={[5]\color{green!40!black}\textbf}
+% }
+
+% \lstset{xleftmargin=.50in, language=HaskellUlisses}
+\endofdump
+
+\usepackage{amsthm}
+\newtheorem{prop}{Proposition}
+\newtheorem{definition}{Definition}
+
+\title{Context-free languages: generalizing \& characterizing}
+\author{Keny Chatain}
+
+\begin{document}
+\maketitle
+
+In this note, I propose to characterize a constructive characterization of the class of context-free languages. The goal is to have a characterization similar to the characteriation of the class of rational languages, as the class of smallest languages closed under some natural operations.
+
+The formal details are interspersed with a Haskell implementation.
+
+\section{The word setting}
+
+\subsection{Introduction}
+
+Here, we assume an alphabet $\Sigma$ (\textsf{Char} in the Haskell implementation) and the set of strings on that alphabet, $\Sigma^*$ (\textsf{String}).
+
+A language is a collection of strings. The use of the word \quo{collection}, instead of \quo{set}, is meant to reflect the fact that not all sets operations will be available to us. A collection, only makes available some operations like union and singleton set and certain form of set comprehension (the latter two are properties of \textsf{Applicative}): 
+
+\lstinputlisting[firstline = 8, lastline = 14]{ContextFree.hs}
+
+Using an applicative allows us to \quo{lift} any operation and any element defined on words into the realm of languages. To an element, corresponds the singleton language of that element. To word concatenation, corresponds language concatenation:
+
+\lstinputlisting[firstline = 16, lastline = 17]{ContextFree.hs}
+
+So languages (i.e. collection of words) have two types of operations defined on them, those that can be imported from the underlying structure of words (concatenate, elements) and those that follow from the structure of a collection (e.g. union). With this, one may define some finite languages:
+
+\lstinputlisting[firstline = 22, lastline = 28]{ContextFree.hs}
+
+In fact, taking advantage of recursivity/lazy evaluation, we can also define infinite languages as well:
+
+\lstinputlisting[firstline = 30, lastline = 32]{ContextFree.hs}
+
+Kleene star can be obtained through a form of recursivity as well:
+
+\lstinputlisting[firstline = 34, lastline = 36]{ContextFree.hs}
+
+So the class of languages we can define is also closed under union, concatenation and Kleene star and contains all finite sets. A minima then, we can define any regular language:
+
+\lstinputlisting[firstline = 38, lastline = 40]{ContextFree.hs}
+
+But recursivity allows us to define more languages than just that. For instance, the famed non-regular $\left\lbrace a^nb^n\ \middle|\ n\geq 0\right\rbrace$:
+
+\lstinputlisting[firstline = 42, lastline = 44]{ContextFree.hs}
+
+In fact, we can \emph{build} a context-free grammar, by making use of crossed recursivity:
+
+\lstinputlisting[firstline = 46, lastline = 55]{ContextFree.hs}
+
+So all context-free languages can be defined in Haskell. Can we do even more than that? Interestingly no. The class of languages definable in Haskell, using only the operations made available by collections, words and recursivity, is the class of context-free languages. In some sense, context-free languages is the smallest class of languages where one can make use of the full power of recursivity
+
+In the next section, I set out to prove that result in its formal details
+
+\subsection{Formalization}
+
+Before we do so, the notion of recursivity needs to be formalized. Informally, recursivity is a way of generating fixed points.
+
+\lstinputlisting[firstline = 61, lastline = 65]{ContextFree.hs}
+
+Of course, in Haskell, these is no guarantee of convergence, hence no guarantee that there is a fixed-point to any function. However, in the limited realm of functions that we consider, such guarantees are possible:
+
+\begin{prop}
+If $f$ is an \emph{increasing} function from languages to languages (i.e. $L\subset L' \Rightarrow f(L)\subset f(L')$), then 
+$$\mathbf{FixPt}(f) = \bigcap \left\lbrace L\ \middle|\ f(L)\subset L\right\rbrace$$
+is a fixed point. It is the smallest fixed point in fact (for subsethood).
+\end{prop}
+%
+Coincidentally, all the functions we can define with union and concatenation are increasing. Had we been working with sets and allowed such operations as complementation, we could construct non-monotonic function and the fixed-point guarantee would have vanished. A further thing to note is that in some high-order sense, $\mathbf{FixPt}$ is increasing
+
+\begin{prop}
+If $f$ and $f'$ are two increasing functions, and $f'$ dominates $f$ (i.e. $f(L)\subset f'(L)$ for all $L$), then 
+$$\mathbf{FixPt}(f) \subset \mathbf{FixPt}(f')$$
+\end{prop}
+%
+So all the operations at our disposal - union, concatenation, fixed-point - will only ever generate increasing functions. Hence, any function we might build from these primitives has a least fixed point \textbf{FixPt}. In other words, we can apply \textbf{FixPt} multiple times to an input
+
+\subsection{}
+
+We are aiming for a characterization of context-free languages in terms of some primitive elements and operations, the same way regular languages are defined in terms of singletons and rational operations. The difference is that here, our primitive operations include \textbf{FixPt}, which operates on functions. Therefore, our expressions will need to model both languages and function on languages at the same time.
+
+\begin{definition}
+A context-free expression is:
+\begin{itemize}
+\item a word (e.g. $a$, $abba$) (type \textsf{Language})
+\item a variable over languages (type \textsf{Language})
+\item the union of two context-free expressions of type \textsf{Language},  denoted $L + L'$
+\item the concatenation of two context-free expressions of type \textsf{Language}, denoted $LL'$
+\item the least fixed-point of a context-free function (type \textsf{Language}$\rightarrow$\textsf{Language}), denoted $\mathbf{Fix}(L)$
+\item if $E$ is a context-free expression of type $a$, $\lambda X. E$ is an expression of type $\textsf{Language}\rightarrow a$
+\item if $E$ is a context-free expression of type $a\rightarrow b$ and $E'$ an expression of type $a$, $E(E')$ is an expression of type $b$
+\end{itemize}
+\end{definition}
+
+We can provide a straightforward semantics for these expressions:
+
+\begin{definition}
+The object denoted by a context-free expression S
+\begin{itemize}
+\item $\dbbm{w}^{g} = \left\lbrace w\right\rbrace$
+\item $\dbbm{X}^{g} = g(X)$
+\item $\dbbm{L + L'}^{g} = \dbbm{L}^{g} \cup\dbbm{L'}^{g} $
+\item $\dbbm{LL'}^{g} = \dbbm{L}^{g} \dbbm{L'}^{g} $
+\item $\dbbm{\lambda X.\ E}^{g} = L\mapsto \dbb{E}^{g[X\leftarrow L]} $
+\item $\dbbm{E(E')}^{g} = \dbbm{E}^{g}\left( \dbbm{E'}^{g}\right) $
+\item $\dbbm{\mathbf{Fix(E)}}^{g} = \mathbf{FixPt}(\dbbm{\mathbf{E}}^{g}) $
+\end{itemize}
+\end{definition}
+%
+Because of the type system and the facts about increasingness discussed in the last subsection, all of these operations are going to be well-defined.
+
+
+
+\section*{Proofs} 
+
+\begin{proof}
+Because $\mathbf{FixPt}(f)$ is an intersection:
+\begin{equation}
+\forall L,\ f(L)\subset L \Rightarrow \mathbf{FixPt}(f) \subset L \label{eqn:subset}
+\end{equation}
+Because $f$ is increasing, we conclude:
+$$\forall L,\ f(L)\subset L \Rightarrow f\left(\mathbf{FixPt}(f)\right) \subset f(L)$$
+Because $L$ is a subset of $f(L)$:
+$$\forall L,\ f(L)\subset L \Rightarrow f\left(\mathbf{FixPt}(f)\right) \subset L$$
+So, by intersection:
+$$f\left(\mathbf{FixPt}(f)\right) \subset \bigcap \left\lbrace L\ \middle|\ f(L)\subset L\right\rbrace = \mathbf{FixPt}(f)$$
+This proves one inclusion. To prove the reverse inclusion, we notice that because $f$ is increasing, we also have
+$$f(f(\mathbf{FixPt}(f)))\subset f(\mathbf{FixPt}(f))$$
+Plugging in this result in eqn \ref{eqn:subset}, we get:
+ $$\mathbf{FixPt}(f) \subset f(\mathbf{FixPt}(f))$$
+ So by double inclusion, these two languages are equal. Because all fixed points $L$ are such that $f(L)\subset L$ and $\mathbf{FixPt}(f)$ is the smallest of these languages, $\mathbf{FixPt}(f)$ is the smallest fixed-point
+\end{proof}
+
+
+\begin{proof}
+Because $f'$ dominates $f$:
+$$f(\mathbf{FixPt}(f'))\subset f'(\mathbf{FixPt}(f')) = \mathbf{FixPt}(f')$$
+By definition of $\mathbf{FixPt}(f)$, this entails that
+$$\mathbf{FixPt}(f)\subset \mathbf{FixPt}(f')$$
+\end{proof}
+
+
+
+
+
+\end{document}
