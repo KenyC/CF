@@ -84,6 +84,8 @@
 % \usepackage{amsthm}
 % \newtheorem{prop}{Proposition}
 % \newtheorem{definition}{Definition}
+
+% \NewEnviron{nothing}{}
 \endofdump
 
 \title{Context-free languages: generalizing \& characterizing}
@@ -199,7 +201,7 @@ Because of the type system and the facts about increasingness discussed in the l
 
 The context-free languages are those languages denoted by a context-free expression. To prove this, two steps are needed. We need to be able to convert from a context-free grammar to context-free expression and vice-versa.
 
-\paragraph*{Obtaining a context-free grammar from context-free expression.} To each expression $E$, we associate a set of context-free rewrite rules \textbf{Rules(E)} and a distinguished start symbol \textbf{Start(E)} as below. I assume that to all language variables correspond a non-terminal and $S_i$ will stand for any nonterminal that hasn't be used so far.
+\paragraph*{Obtaining a context-free grammar from a context-free expression.} To each expression $E$, we associate a set of context-free rewrite rules \textbf{Rules(E)} and a distinguished start symbol \textbf{Start(E)} as below. I assume that to all language variables correspond a non-terminal and $S_i$ will stand for any nonterminal that hasn't be used so far.
 
 \begin{itemize}
 \item 
@@ -287,10 +289,54 @@ It can be argued that the Haskell fragment is more expressive than context-free 
 
 I believe not, but the formalization would be more involved. This is because we now need to consider higher-order fixed points, like fixed points of $(\textsf{ContextFree}\rightarrow \textsf{ContextFree})\rightarrow  \textsf{ContextFree}\rightarrow \textsf{ContextFree}$. We would need a theorem giving us the existence of a privileged fixed point for such expressions. All of this is feasible, I believe.
 
-There is also an aspect of the Haskellization which is regrettable. In Haskell, there is a way to write context-sensitive languages if we afford ourselves of more string-based operations than the primitive operation of word, concatentation. For instance, this implementation of $\left\lbrace a^nba^nba^n\ \middle|\ n\geq 0\right\rbrace$:
+There is also an aspect of the Haskellization which is regrettable. In Haskell, there is a way to write context-sensitive languages if we allow ourselves to lift more complex string-based operations than the primitive operation of word, concatenation. For instance, this implementation of $\left\lbrace a^nba^nba^n\ \middle|\ n\geq 0\right\rbrace$:
 
 \lstinputlisting[firstline = 68, lastline = 71]{ContextFree.hs}
 
+\begin{nothing}
+\subsection{Generalization}
+If $(E, \prec)$ is an ordered set where every subset has an infimum and a supremum, then there is an ordering on $E^F$ with the same properties.
+
+\begin{proof}
+The order is domination. $f'$ dominates $f$ iff for every $x$, $f(x)\prec f'(x)$. We write $f\prec_D f'$. Then the supremum of a set of function is obtained as the pointwise supremum
+
+$\sup \mathcal F = \lambda x.\ \sup\left\lbrace f(x)\ \middle|\ f\in \mathcal{F}\right\rbrace$
+
+This is indeed a supremum. If $g$ dominates all functions in $\mathcal F$, then
+
+$$\forall x,\forall f\in\mathcal{F},\ f(x)\prec g(x)$$
+From which it follows that:
+
+$$\forall x,\ \sup \mathcal F(x) = \sup\left\lbrace f(x)\ \middle|\ f\in \mathcal{F}\right\rbrace\prec g(x)$$
+
+So $\sup \mathcal F$ is an upper bound. Now, let $g$ be any function that does not dominate $\sup \mathcal{F}$. That is to say:
+
+$$\exists x,\ \sup \mathcal{F}(x)\not\prec g(x) $$
+
+In other words:
+
+$$\exists x,\ \sup\left\lbrace f(x)\ \middle|\ f\in \mathcal{F}\right\rbrace\not\prec g(x) $$
+
+For this this to be so, there has to be some value $f(x)$ that $g(x)$ is not greater than, by definition of the supremum:
+
+$$\exists x,\exists f,\ f(x)\not\prec g(x) $$
+
+So $g$ does not dominate all functions in $\mathcal F$; it is not an upper bound of $\mathcal F$
+
+$$\exists f,\ f\not\prec_D g $$
+
+By contraposition, this means that every upper bound of $\mathcal F$ dominate $\sup \mathcal F$, making it the least upper bound, the infimum.
+A similar proof is available for the infimum
+\end{proof}
+
+If $(E, \prec)$ is an ordered set where every subset has an infimum and a supremum, then every increasing function has a least fixed point.
+
+\begin{proof}
+The proof is that already given earlier
+\end{proof}
+
+This means that we can define least fixed-points for higher-order functions as well.
+\end{nothing}
 
 
 \section{Extensions}
@@ -312,6 +358,16 @@ This is useful in defining for instance context-free relations, the equivalent o
 \subsection{Arbitrary structures}
 
 In fact, more generally, context-free languages can be defined on any structure whose primitive operations can be lifted by an Applicative. For instance, trees:
+
+[INSERT EXAMPLE]
+
+The only crucial piece for us to define a context-free language is the existence of a \textbf{FixedPt} function. \textbf{FixedPt} is only defined for increasing functions. Importantly however, lifted operations always result in increasing functions:
+
+\begin{prop}
+If $\uparrow$ is a unary operation defined on $S$, then the lifted operation $\uparrow\hspace{-1pt}\uparrow$ on collections of $S$ is increasing in its argument.\\
+If $\oplus$ is a binary operation defined on $S$, then the lifted operation $\circledast$ on collections of $S$ is increasing in both arguments.\\
+\emph{etc.}
+\end{prop}
 
 
 
@@ -346,6 +402,11 @@ By definition of $\mathbf{FixPt}(f)$, this entails that
 $$\mathbf{FixPt}(f)\subset \mathbf{FixPt}(f')$$
 \end{proof}
 
+
+\begin{proof}
+This simply follows from the definition of the lifted version. If $L\subset L'$, then:
+$$\uparrow\hspace{-1pt}\uparrow L = \left\lbrace \uparrow x\ \middle|\ x\in L\right\rbrace \subset   \left\lbrace \uparrow x\ \middle|\ x\in L'\right\rbrace = \uparrow\hspace{-1pt}\uparrow L'$$
+\end{proof}
 
 
 
