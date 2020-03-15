@@ -58,7 +58,7 @@
 % 	emph=
 % 	{[2]
 % 		Bool,Char,Double,Either,Float,IO,Integer,Int,Maybe,Ordering,Rational,Ratio,ReadS,ShowS,String,
-% 		Word8,InPacket, ContextFree
+% 		Word8,InPacket, ContextFree, ContextFreeRelation
 % 	},
 % 	emphstyle={[2]\color{green!40!black}},
 % 	emph=
@@ -80,11 +80,11 @@
 % }
 
 % \lstset{xleftmargin=.50in, language=HaskellUlisses}
-\endofdump
 
-\usepackage{amsthm}
-\newtheorem{prop}{Proposition}
-\newtheorem{definition}{Definition}
+% \usepackage{amsthm}
+% \newtheorem{prop}{Proposition}
+% \newtheorem{definition}{Definition}
+\endofdump
 
 \title{Context-free languages: generalizing \& characterizing}
 \author{Keny Chatain}
@@ -118,7 +118,7 @@ In fact, taking advantage of recursivity/lazy evaluation, we can also define inf
 
 \lstinputlisting[firstline = 30, lastline = 32]{ContextFree.hs}
 
-Kleene star can be obtained through a form of recursivity as well:
+More generally, Kleene star can be defined through a form of recursivity as well:
 
 \lstinputlisting[firstline = 34, lastline = 36]{ContextFree.hs}
 
@@ -152,7 +152,7 @@ $$\mathbf{FixPt}(f) = \bigcap \left\lbrace L\ \middle|\ f(L)\subset L\right\rbra
 is a fixed point. It is the smallest fixed point in fact (for subsethood).
 \end{prop}
 %
-Coincidentally, all the functions we can define with union and concatenation are increasing. Had we been working with sets and allowed such operations as complementation, we could construct non-monotonic function and the fixed-point guarantee would have vanished. A further thing to note is that in some high-order sense, $\mathbf{FixPt}$ is increasing
+Coincidentally, all the functions we can define with union and concatenation are increasing. Had we been working with sets, instead of collections, and allowed such operations as complementation, we could construct non-monotonic function and the fixed-point guarantee would have vanished. A further thing to note is that in some high-order sense, $\mathbf{FixPt}$ is increasing
 
 \begin{prop}
 If $f$ and $f'$ are two increasing functions, and $f'$ dominates $f$ (i.e. $f(L)\subset f'(L)$ for all $L$), then 
@@ -161,19 +161,19 @@ $$\mathbf{FixPt}(f) \subset \mathbf{FixPt}(f')$$
 %
 So all the operations at our disposal - union, concatenation, fixed-point - will only ever generate increasing functions. Hence, any function we might build from these primitives has a least fixed point \textbf{FixPt}. In other words, we can apply \textbf{FixPt} multiple times to an input
 
-\subsection{}
+\subsection{Context-free expressions}
 
 We are aiming for a characterization of context-free languages in terms of some primitive elements and operations, the same way regular languages are defined in terms of singletons and rational operations. The difference is that here, our primitive operations include \textbf{FixPt}, which operates on functions. Therefore, our expressions will need to model both languages and function on languages at the same time.
 
 \begin{definition}
 A context-free expression is:
 \begin{itemize}
-\item a word (e.g. $a$, $abba$) (type \textsf{Language})
-\item a variable over languages (type \textsf{Language})
-\item the union of two context-free expressions of type \textsf{Language},  denoted $L + L'$
-\item the concatenation of two context-free expressions of type \textsf{Language}, denoted $LL'$
-\item the least fixed-point of a context-free function (type \textsf{Language}$\rightarrow$\textsf{Language}), denoted $\mathbf{Fix}(L)$
-\item if $E$ is a context-free expression of type $a$, $\lambda X. E$ is an expression of type $\textsf{Language}\rightarrow a$
+\item a word (e.g. $a$, $abba$) (type \textsf{ContextFree})
+\item a variable over languages (type \textsf{ContextFree})
+\item the union of two context-free expressions of type \textsf{ContextFree},  denoted $L + L'$
+\item the concatenation of two context-free expressions of type \textsf{ContextFree}, denoted $LL'$
+\item the least fixed-point of a context-free function (type \textsf{ContextFree}$\rightarrow$\textsf{ContextFree}), denoted $\mathbf{Fix}(L)$
+\item if $E$ is a context-free expression of type $a$, $\lambda X. E$ is an expression of type $\textsf{ContextFree}\rightarrow a$
 \item if $E$ is a context-free expression of type $a\rightarrow b$ and $E'$ an expression of type $a$, $E(E')$ is an expression of type $b$
 \end{itemize}
 \end{definition}
@@ -194,6 +194,127 @@ The object denoted by a context-free expression S
 \end{definition}
 %
 Because of the type system and the facts about increasingness discussed in the last subsection, all of these operations are going to be well-defined.
+
+\subsection{Equivalence to context-free languages}
+
+The context-free languages are those languages denoted by a context-free expression. To prove this, two steps are needed. We need to be able to convert from a context-free grammar to context-free expression and vice-versa.
+
+\paragraph*{Obtaining a context-free grammar from context-free expression.} To each expression $E$, we associate a set of context-free rewrite rules \textbf{Rules(E)} and a distinguished start symbol \textbf{Start(E)} as below. I assume that to all language variables correspond a non-terminal and $S_i$ will stand for any nonterminal that hasn't be used so far.
+
+\begin{itemize}
+\item 
+$\mathbf{Rules}[w] = [S\rightarrow w]$\\
+$\mathbf{Start}[w] = S$
+\item 
+$\mathbf{Rules}[X] = []$\\
+$\mathbf{Start}[X] = X$
+\item 
+$\mathbf{Rules}[EE'] = [S \rightarrow \mathbf{Start}(E)\mathbf{Start}(E')]$\\
+$\mathbf{Start}[EE'] = S$
+\item 
+$\mathbf{Rules}[E + E'] = [S \rightarrow \mathbf{Start}(E), S\rightarrow\mathbf{Start}(E')]$\\
+$\mathbf{Start}[E + E'] = S$
+\item 
+$\mathbf{Rules}[\lambda X. E] = \mathbf{Rules}(E)$\\
+$\mathbf{Start}[\lambda X. E] = \mathbf{Start}(E)$
+\item 
+$\mathbf{Rules}[(\lambda X. E)E'] = \mathbf{Rules}(E) +\hspace{-3pt}+\ \mathbf{Rules}(E') +\hspace{-3pt}+\ [X\rightarrow \textbf{Start}(E')]$\\
+$\mathbf{Start}[(\lambda X. E)E'] = \mathbf{Start}(E)$
+\item 
+$\mathbf{Rules}[\mathbf{Fix}(\lambda X. E)] = \mathbf{Rules}(E) +\hspace{-3pt}+\ [X\rightarrow \textbf{Start}(E)]$\\
+$\mathbf{Start}[\mathbf{Fix}(\lambda X. E)] = X$
+\end{itemize}
+
+\paragraph*{Obtaining a context-free expression from a context-free grammar.} The following is extremely reminiscent of the method used to resolve system of language equations for regular expressions (cf proof of Kleene's theorem). The first step is to rewrite a context free grammar as a system of equations over languages. I will show how this is done on a simple example ; hopefully, this example will make a more general statement superfluous. To each terminal $X$ corresponds the unknown $L_X$
+
+\begin{figure}
+\begin{tabularx}{\textwidth}{X  X  X}
+Original grammar & Factorizing left-hand sides & Convert to a system of equation\\
+\midrule
+$T \rightarrow aVb$\newline
+$V \rightarrow \epsilon$ \newline
+$V \rightarrow T c V$
+&
+$T \rightarrow aVb$\newline
+$V \rightarrow \epsilon + T c V$
+&
+$L_T = aL_Vb$\newline
+$L_V = \epsilon + L_T c L_V$
+\end{tabularx}
+\end{figure}
+%
+There is of course a relation between the solution of this system of equations and the context-free language itself:
+
+\begin{prop}\label{prop:sys_eqn}
+The system of equations obtained from a context-free grammar has a smallest solution (for inclusion). This smallest solution is the tuple $(L_{X_1} = L(X_1),\ldots, L_{X_n}= L(X_n))$ where $L(X_i)$ is the language generated by non-terminal $X_i$ 
+\end{prop}
+%
+So in our example:, we can in particular write
+
+$$
+\begin{array}{lcl}
+L(T) &=& aL(V)b\\
+L(V) &=& \epsilon + L(T) c L(V)
+\end{array}
+$$
+
+Each of these equation can be seen as stating that a certain $L(X)$ is the fixed point of a function\footnote{Note that I am temporarily suspending the distinction between context-free expressions and the language they denote. This distinction is a technical hassle.}:
+
+$$L(V) = \left( 	\lambda X.\ \epsilon + L(T)cX\right)\left( L(V)\right)$$
+
+Two things: first, each $L(X)$ has to be the smallest such fixed point. Otherwise, we could form a non-bigger solution by replacing $L(X)$ with a non-bigger fixed point in the solution tuple. Second, the function is increasing that each $L(X)$ is the fixed point of is increasing. In other words:
+
+$$L(V) = \mathbf{Fix}\left( \lambda X.\ \epsilon + L(T)cX\right)$$
+
+These remarks allow us to reduce any of the $L(X)$ into a context-free expression. The idea is the same as with any system of equations: express one unknown in terms of the other, replace the unknown with its expression in terms of the other in all the other equations, repeat until all unknowns are eliminated. So in our particular case, we can replace $L(V)$ with its expression above in the first equation of the system
+
+$$L(T) = a\mathbf{Fix}\left( \lambda X.\ \epsilon + L(T)cX\right)b$$
+
+This can be taken to mean that $L(T)$ is the fixed point of the function:
+
+$$L(T) = \left(\lambda Y.\ a\mathbf{Fix}\left( \lambda X.\ \epsilon + YcX\right)b\right)\left(L(T)\right)$$
+
+With a similar reasoning as above, we can conclude that:
+
+$$L(T) = \mathbf{Fix}\left(\lambda Y.\ a\mathbf{Fix}\left( \lambda X.\ \epsilon + YcX\right)b\right)$$
+
+If $T$ is the start symbol of the grammar, then we just found that the context-free language can be expressed by a context-free expression. This concludes the proof that every context-free language is expressible in terms of these expressions
+
+
+\subsection{Missing pieces}
+
+It can be argued that the Haskell fragment is more expressive than context-free expressions. For instance, Haskell can express functions of type $(\textsf{ContextFree}\rightarrow \textsf{ContextFree})\rightarrow  \textsf{ContextFree}\rightarrow \textsf{ContextFree}$, while context-free expressions do not. If such functions are available to Haskell, can Haskell express more languages than context-free expressions can? 
+
+I believe not, but the formalization would be more involved. This is because we now need to consider higher-order fixed points, like fixed points of $(\textsf{ContextFree}\rightarrow \textsf{ContextFree})\rightarrow  \textsf{ContextFree}\rightarrow \textsf{ContextFree}$. We would need a theorem giving us the existence of a privileged fixed point for such expressions. All of this is feasible, I believe.
+
+There is also an aspect of the Haskellization which is regrettable. In Haskell, there is a way to write context-sensitive languages if we afford ourselves of more string-based operations than the primitive operation of word, concatentation. For instance, this implementation of $\left\lbrace a^nba^nba^n\ \middle|\ n\geq 0\right\rbrace$:
+
+\lstinputlisting[firstline = 68, lastline = 71]{ContextFree.hs}
+
+
+
+\section{Extensions}
+
+\subsection{Monoids}
+
+In essence, all the work we have been doing did not depend, in any essential manner, on taking words to be the underlying monoid. In fact, we can define context-free languages in any monoid:
+
+\lstinputlisting[firstline = 4, lastline = 7]{GeneralizedContextFree.hs}
+
+Kleene star and concatenation is definable in the same way:
+
+\lstinputlisting[firstline = 13, lastline = 19]{GeneralizedContextFree.hs}
+
+This is useful in defining for instance context-free relations, the equivalent of rational relations/finite-state transducers. Here is for instance the duplicating function on strings:
+
+\lstinputlisting[firstline = 22, lastline = 26]{GeneralizedContextFree.hs}
+
+\subsection{Arbitrary structures}
+
+In fact, more generally, context-free languages can be defined on any structure whose primitive operations can be lifted by an Applicative. For instance, trees:
+
+
+
 
 
 

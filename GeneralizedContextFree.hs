@@ -4,33 +4,40 @@
 class Applicative f => Collection f where
 	union :: f a -> f a -> f a
 
-
-
-type ContextFree a = Monoid a => forall f . Collection f => f a
-
-concatenate :: (Monoid a, Collection f) => f a -> f a -> f a
-concatenate l1 l2 = (pure mappend) <*> l1 <*> l2
-
-
-star :: Monoid a => ContextFree a -> ContextFree a
-star l =  (pure mempty) `union` (l `concatenate` (star l))
+type ContextFree a = forall f . Collection f => f a
 
 -- When needed to check our languages, I use Lists to represent collections
 instance Collection [] where
 	union = (++)
 
--- Claim:
--- the context-free languages are the languages that can be defined in the lazy calculous of Haskell
+-- concatenation
+cat :: (Monoid a, Collection f) => f a -> f a -> f a
+cat l1 l2 = (pure mappend) <*> l1 <*> l2
+
+-- Kleene star
+star :: Monoid a => ContextFree a -> ContextFree a
+star l =  (pure mempty) `union` (l `cat` (star l))
 
 
--- Examples
+type ContextFreeRelation = ContextFree (String, String)
 
--- Given a parenthesis construct the parenthesis language with that parenthesis  
-dyck_1 :: Monoid a => a -> a -> ContextFree a
-dyck_1 a b = (pure mempty)  `union` ((pure a) `concatenate` (dyck_1 a b)  `concatenate` (pure b)) `union` ((dyck_1 a b) `concatenate` (dyck_1 a b))
+-- establishes a relation between w and ww for any w made of a's and b's
+duplicate :: ContextFreeRelation
+duplicate  = (pure mempty) `union` ((pure ("a", "a")) `cat` duplicate `cat` (pure ("", "a"))) `union`
+									((pure ("b", "b")) `cat` duplicate `cat` (pure ("", "b")))
 
 
--- To test that our languages are working, we'll instantiate the type List
-test :: [String]
-test = dyck_1 "a" "b"
--- not all elements of the parenthesis language will be available through this
+
+class BinaryTree a where
+	merge :: a -> a -> a
+	left :: a -> Maybe a  
+	right :: a -> Maybe a  
+
+lMerge :: BinaryTree a => ContextFree a -> ContextFree a -> ContextFree a
+lMerge l1 l2 = (pure merge) <*> l1 <*> l2
+
+lLeft :: BinaryTree a => ContextFree a -> ContextFree (Maybe a)
+lLeft = fmap left
+
+lRight :: BinaryTree a => ContextFree a -> ContextFree (Maybe a)
+lRight = fmap right

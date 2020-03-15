@@ -11,36 +11,36 @@ instance Collection [] where
 	union = (++)
 
 
-type Language = forall f . Collection f => f String
+type ContextFree = forall f . Collection f => f String
 
-cat :: Language -> Language -> Language
-cat l1 l2 = ((pure (++)) <*> l1) <*> l2
+cat :: ContextFree -> ContextFree -> ContextFree
+cat l1 l2 = (pure (++)) <*> l1 <*> l2
 
 
 -- Examples
 
 -- language1 : ab + ba
-language1 :: Language
+language1 :: ContextFree
 language1 = ((pure "a") `cat` (pure "b")) `union` ((pure "b") `cat` (pure "a"))
 
 -- language2 : ab(a+b)
-language2 :: Language
+language2 :: ContextFree
 language2 = (pure "a") `cat` (pure "b") `cat` ((pure "a") `union` (pure "b"))
 
 -- language3: a*
-language3 :: Language
+language3 :: ContextFree
 language3 = (pure "") `union` ((pure "a") `cat` language3)
 
 -- Kleene start \L -> L*
-star :: Language -> Language
+star :: ContextFree -> ContextFree
 star l = (pure "") `union` (l `cat` (star l))
 
 -- language4: a*b*
-language4 :: Language
+language4 :: ContextFree
 language4 = (star $ pure "a") `cat` (star $ pure "b")
 
 -- language5: {a^nb^n | n >= 0}
-language5 :: Language
+language5 :: ContextFree
 language5 = pure "" `union` (pure "a" `cat` language5 `cat` pure "b")
 
 {-
@@ -49,17 +49,23 @@ TUPLE -> ( VALUES )
 VALUES -> VALUES, TUPLE
 VALUES -> empty string
 -}
-tuple :: Language
-values :: Language
+tuple :: ContextFree
+values :: ContextFree
 tuple = (pure "(") `cat` values `cat` (pure ")")
 values = (pure "") `union` (values `cat` pure "," `cat` tuple)
 
 -- defining recursivity in terms of fixed point
-fix :: (a -> a) -> a
+fix :: (ContextFree -> ContextFree) -> ContextFree
 fix f = f $ fix f
 
 -- language3prime: a*
-rec_l3 :: Language -> Language
+rec_l3 :: ContextFree -> ContextFree
 rec_l3 l = (pure "") `union` ((pure "a") `cat` l)
-language3prime :: Language
-language3prime = fix rec
+language3prime :: ContextFree
+language3prime = fix rec_l3
+
+
+-- context-sensitive languages, if we allow "non-primitive" lifted operations
+-- language6 : a^nba^nba^n
+language6 :: ContextFree
+language6 = fmap (\x -> x ++ "b" ++ x ++ "b" ++ x) (star $ pure "a")
