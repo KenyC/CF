@@ -112,7 +112,7 @@ Using an applicative allows us to \quo{lift} any operation and any element defin
 
 \lstinputlisting[firstline = 16, lastline = 17]{ContextFree.hs}
 
-So languages (i.e. collection of words) have two types of operations defined on them, those that can be imported from the underlying structure of words (concatenate, elements) and those that follow from the structure of a collection (e.g. union). With this, one may define some finite languages:
+So languages (i.e. collection of words) have two types of operations defined on them: those that can be imported from the underlying structure of words (concatenate, elements) and those that follow from the structure of a collection (e.g. union). With this, one may define some finite languages:
 
 \lstinputlisting[firstline = 22, lastline = 28]{ContextFree.hs}
 
@@ -136,15 +136,15 @@ In fact, we can \emph{build} a context-free grammar, by making use of crossed re
 
 \lstinputlisting[firstline = 46, lastline = 55]{ContextFree.hs}
 
-So all context-free languages can be defined in Haskell. Can we do even more than that? Interestingly no. The class of languages definable in Haskell, using only the operations made available by collections, words and recursivity, is the class of context-free languages. In some sense, context-free languages is the smallest class of languages where one can make use of the full power of recursivity
+So all context-free languages can be defined in Haskell. Can we do even more than that? Interestingly no. The class of languages definable in Haskell, using only the operations made available by collections, words and recursivity, is the class of context-free languages. In some sense, context-free languages is the smallest class of languages closed under union and concatenation and recursive functions made from them.
 
-In the next section, I set out to prove that result in its formal details
+In the next section, I set out to prove that result in its formal details.
 
 \subsection{Formalization}
 
 Before we do so, the notion of recursivity needs to be formalized. Informally, recursivity is a way of generating fixed points.
 
-\lstinputlisting[firstline = 61, lastline = 65]{ContextFree.hs}
+\lstinputlisting[firstline = 57, lastline = 65]{ContextFree.hs}
 
 Of course, in Haskell, these is no guarantee of convergence, hence no guarantee that there is a fixed-point to any function. However, in the limited realm of functions that we consider, such guarantees are possible:
 
@@ -154,18 +154,18 @@ $$\mathbf{FixPt}(f) = \bigcap \left\lbrace L\ \middle|\ f(L)\subset L\right\rbra
 is a fixed point. It is the smallest fixed point in fact (for subsethood).
 \end{prop}
 %
-Coincidentally, all the functions we can define with union and concatenation are increasing. Had we been working with sets, instead of collections, and allowed such operations as complementation, we could construct non-monotonic function and the fixed-point guarantee would have vanished. A further thing to note is that in some high-order sense, $\mathbf{FixPt}$ is increasing
+Coincidentally, all the functions we can define with union and concatenation are increasing. Had we been working with sets, instead of collections, and allowed such operations as complementation, we could construct non-monotonic function and the fixed-point guarantee would have vanished. A further thing to note is that in some high-order sense, $\mathbf{FixPt}$ is increasing:
 
 \begin{prop}
 If $f$ and $f'$ are two increasing functions, and $f'$ dominates $f$ (i.e. $f(L)\subset f'(L)$ for all $L$), then 
 $$\mathbf{FixPt}(f) \subset \mathbf{FixPt}(f')$$
 \end{prop}
 %
-So all the operations at our disposal - union, concatenation, fixed-point - will only ever generate increasing functions. Hence, any function we might build from these primitives has a least fixed point \textbf{FixPt}. In other words, we can apply \textbf{FixPt} multiple times to an input
+So all the operations at our disposal - union, concatenation- will only ever generate increasing functions. Any function formed from \textbf{FixPt} will also be increasing and \textbf{FixedPt} can apply to it. So it makes sense to talk about the smallest set containing finite languages closed under these 3 operations: union, concatenation, and fixed point. The next section makes that precise.
 
 \subsection{Context-free expressions}
 
-We are aiming for a characterization of context-free languages in terms of some primitive elements and operations, the same way regular languages are defined in terms of singletons and rational operations. The difference is that here, our primitive operations include \textbf{FixPt}, which operates on functions. Therefore, our expressions will need to model both languages and function on languages at the same time.
+We are aiming for a characterization of context-free languages in terms of some primitive elements and operations, the same way rational languages are defined as the smallest class of languages containing singletons and closed under rational operations (union, concatenation, Kleene star). The difference is that here, our primitive operations include \textbf{FixPt}, which operates on functions. Therefore, our expressions will need to model both languages and functions on languages at the same time.
 
 \begin{definition}
 A context-free expression is:
@@ -361,14 +361,16 @@ In fact, more generally, context-free languages can be defined on any structure 
 
 [INSERT EXAMPLE]
 
-The only crucial piece for us to define a context-free language is the existence of a \textbf{FixedPt} function. \textbf{FixedPt} is only defined for increasing functions. Importantly however, lifted operations always result in increasing functions:
+What is a context-free language of trees? By an unfortunate accident of history, these are what have been called regular tree languages\ldots
+
+The only crucial piece for us to define a context-free language is the existence of a \textbf{FixedPt} function. \textbf{FixedPt} is only defined for increasing functions. Importantly, lifted operations always result in increasing functions:
 
 \begin{prop}
 If $\uparrow$ is a unary operation defined on $S$, then the lifted operation $\uparrow\hspace{-1pt}\uparrow$ on collections of $S$ is increasing in its argument.\\
 If $\oplus$ is a binary operation defined on $S$, then the lifted operation $\circledast$ on collections of $S$ is increasing in both arguments.\\
 \emph{etc.}
 \end{prop}
-
+%
 
 
 

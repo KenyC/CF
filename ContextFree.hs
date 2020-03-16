@@ -9,8 +9,8 @@ class Applicative f => Collection f where
 
 instance Collection [] where
 	union = (++)
-
-
+-- use "show $ take 10 l" to display elements from any given language "l"
+-- TODO: in practice, we'd be better off with something that interspersed elements from both lists ; otherwise, listing elements form the language is not exhaustive
 type ContextFree = forall f . Collection f => f String
 
 cat :: ContextFree -> ContextFree -> ContextFree
@@ -33,7 +33,7 @@ language3 = (pure "") `union` ((pure "a") `cat` language3)
 
 -- Kleene start \L -> L*
 star :: ContextFree -> ContextFree
-star l = (pure "") `union` (l `cat` (star l))
+star l = pure "" `union` (l `cat` (star l))
 
 -- language4: a*b*
 language4 :: ContextFree
