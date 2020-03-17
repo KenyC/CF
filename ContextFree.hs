@@ -69,3 +69,13 @@ language3prime = fix rec_l3
 -- language6 : a^nba^nba^n
 language6 :: ContextFree
 language6 = fmap (\x -> x ++ "b" ++ x ++ "b" ++ x) (star $ pure "a")
+
+-- context-sensitive language with higher-order fixed-point
+-- generator is the least fixed point of \F \L LLL + F(aL)
+generator :: ContextFree -> ContextFree
+generator l = (l `cat` l `cat` l) `union` (generator $ (pure "a") `cat` l)
+-- language7 : a^nba^nba^nb
+language7 :: ContextFree
+language7 = generator $ pure "b"
+
+

@@ -285,13 +285,19 @@ If $T$ is the start symbol of the grammar, then we just found that the context-f
 
 \subsection{Missing pieces}
 
-It can be argued that the Haskell fragment is more expressive than context-free expressions. For instance, Haskell can express functions of type $(\textsf{ContextFree}\rightarrow \textsf{ContextFree})\rightarrow  \textsf{ContextFree}\rightarrow \textsf{ContextFree}$, while context-free expressions do not. If such functions are available to Haskell, can Haskell express more languages than context-free expressions can? 
-
-I believe not, but the formalization would be more involved. This is because we now need to consider higher-order fixed points, like fixed points of $(\textsf{ContextFree}\rightarrow \textsf{ContextFree})\rightarrow  \textsf{ContextFree}\rightarrow \textsf{ContextFree}$. We would need a theorem giving us the existence of a privileged fixed point for such expressions. All of this is feasible, I believe.
-
-There is also an aspect of the Haskellization which is regrettable. In Haskell, there is a way to write context-sensitive languages if we allow ourselves to lift more complex string-based operations than the primitive operation of word, concatenation. For instance, this implementation of $\left\lbrace a^nba^nba^n\ \middle|\ n\geq 0\right\rbrace$:
+There is one aspect of the Haskellization which is regrettable. In Haskell, there is a way to write context-sensitive languages if we allow ourselves to lift more complex string-based operations than the primitive operation of word, concatenation. For instance, this implementation of $\left\lbrace a^nba^nba^n\ \middle|\ n\geq 0\right\rbrace$:
 
 \lstinputlisting[firstline = 68, lastline = 71]{ContextFree.hs}
+
+Added to that, it can be argued that the Haskell fragment is more expressive than context-free expressions. For instance, Haskell can express functions of type $(\textsf{ContextFree}\rightarrow \textsf{ContextFree})\rightarrow  \textsf{ContextFree}\rightarrow \textsf{ContextFree}$, while context-free expressions do not. If such functions are available to Haskell, can Haskell express more languages than context-free expressions can? 
+
+Formally, this corresponds to asking whether we would obtain non-context-free languages if we allowed higher-order fixed-points, i.e. fixed points of $(\textsf{ContextFree}\rightarrow \textsf{ContextFree})\rightarrow  \textsf{ContextFree}\rightarrow \textsf{ContextFree}$. We would need a theorem giving us the existence of a privileged fixed point for such expressions. This is feasible. 
+
+Contrary to my own expectations, it turns out that context-sensitive languages can be expressed using higher-order fixed-points:
+
+\lstinputlisting[firstline = 73, lastline = 79]{ContextFree.hs}
+
+
 
 \begin{nothing}
 \subsection{Generalization}
