@@ -227,7 +227,7 @@ $\mathbf{Rules}[\mathbf{Fix}(\lambda X. E)] = \mathbf{Rules}(E) +\hspace{-3pt}+\
 $\mathbf{Start}[\mathbf{Fix}(\lambda X. E)] = X$
 \end{itemize}
 
-\paragraph*{Obtaining a context-free expression from a context-free grammar.} The following is extremely reminiscent of the method used to resolve system of language equations for regular expressions (cf proof of Kleene's theorem). The first step is to rewrite a context free grammar as a system of equations over languages. I will show how this is done on a simple example ; hopefully, this example will make a more general statement superfluous. To each terminal $X$ corresponds the unknown $L_X$
+\paragraph*{Obtaining a context-free expression from a context-free grammar.} This direction is extremely reminiscent of the method used to resolve system of language equations for regular expressions (cf proof of Kleene's theorem). The first step is to rewrite a context free grammar as a system of equations over languages. I will show how this is done on a simple example ; hopefully, this example will make a more general statement superfluous. To each terminal $X$ corresponds the unknown $L_X$
 
 \begin{figure}
 \begin{tabularx}{\textwidth}{X  X  X}
@@ -264,7 +264,7 @@ Each of these equation can be seen as stating that a certain $L(X)$ is the fixed
 
 $$L(V) = \left( 	\lambda X.\ \epsilon + L(T)cX\right)\left( L(V)\right)$$
 
-Two things: first, each $L(X)$ has to be the smallest such fixed point. Otherwise, we could form a non-bigger solution by replacing $L(X)$ with a non-bigger fixed point in the solution tuple. Second, the function is increasing that each $L(X)$ is the fixed point of is increasing. In other words:
+Two things: first, each $L(X)$ has to be the smallest such fixed point. Otherwise, we could form a non-bigger solution to the system of equations by replacing $L(X)$ with a non-bigger fixed point in the solution tuple. Second, the function that $L(X)$ is the fixed point of is increasing. In other words:
 
 $$L(V) = \mathbf{Fix}\left( \lambda X.\ \epsilon + L(T)cX\right)$$
 
@@ -384,6 +384,8 @@ If $\oplus$ is a binary operation defined on $S$, then the lifted operation $\ci
 
 \section*{Proofs} 
 
+\subsection{There is a smallest fixed point}
+
 \begin{proof}
 Because $\mathbf{FixPt}(f)$ is an intersection:
 \begin{equation}
@@ -402,6 +404,7 @@ Plugging in this result in eqn \ref{eqn:subset}, we get:
  So by double inclusion, these two languages are equal. Because all fixed points $L$ are such that $f(L)\subset L$ and $\mathbf{FixPt}(f)$ is the smallest of these languages, $\mathbf{FixPt}(f)$ is the smallest fixed-point
 \end{proof}
 
+\subsection{\textbf{FixPt} is increasing}
 
 \begin{proof}
 Because $f'$ dominates $f$:
@@ -410,6 +413,7 @@ By definition of $\mathbf{FixPt}(f)$, this entails that
 $$\mathbf{FixPt}(f)\subset \mathbf{FixPt}(f')$$
 \end{proof}
 
+\subsection{Lift to sets creates increasing structures}
 
 \begin{proof}
 This simply follows from the definition of the lifted version. If $L\subset L'$, then:
