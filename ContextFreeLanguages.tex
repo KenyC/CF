@@ -106,7 +106,7 @@ Here, we assume an alphabet $\Sigma$ (\textsf{Char} in the Haskell implementatio
 
 A language is a collection of strings. The use of the word \quo{collection}, instead of \quo{set}, is meant to reflect the fact that not all sets operations will be available to us. A collection, only makes available some operations like union and singleton set and certain form of set comprehension (the latter two are properties of \textsf{Applicative}): 
 
-\lstinputlisting[firstline = 8, lastline = 14]{ContextFree.hs}
+\lstinputlisting[firstline = 6, lastline = 14]{ContextFree.hs}
 
 Using an applicative allows us to \quo{lift} any operation and any element defined on words into the realm of languages. To an element, corresponds the singleton language of that element. To word concatenation, corresponds language concatenation:
 
